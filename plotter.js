@@ -77,16 +77,31 @@ const updateChart = data => {
 };
 
 const form = document.querySelector("#userinfo");
+const statusTag = document.querySelector("#status");
 
 async function sendData() {
   // Associate the FormData object with the form element
   const formData = new FormData(form);
 
   try {
+    
+    statusTag.innerHTML = "Fetching data ...";
     const response = await fetch(
         "https://ratings-api-gjto3y2yyq-ue.a.run.app/api/v1/ratings/" + formData.get("username") + (formData.get("format") ? "?format=" + formData.get("format") : ""), 
         {method: "GET"}
     );
+
+    if(response.status === 404) {
+        statusTag.innerHTML = "User " + formData.get("username") + " is not being tracked; to start tracking your user, hop on Pokemon Showdown as your user and message '.subscribe' (without quotation) to my bot, 'im tofas bot'!";
+        return;
+    }
+
+    if(response.status === 429) {
+        statusTag.innerHTML = "Rate limit reached. You may only submit 5 times within a minute, please try again shortly";
+        return;
+    }
+
+    statusTag.innerHTML = "";
 
     const data = await response.json();
     console.log(data);
