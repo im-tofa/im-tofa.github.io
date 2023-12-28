@@ -13,7 +13,7 @@ const chart = new Chart("myChart", {
 
 const dateToEpoch = date => {
     const time = date.valueOf();
-    return time - (time % 86400000);
+    return time - (time % 3600000);
 }
 
 const R = () => Math.floor(Math.random() * 256);
@@ -71,7 +71,7 @@ const updateChart = data => {
         datasets.push(dataset);
     }
 
-    chart.data.labels = dates.map(timestamp => new Date(timestamp).toLocaleDateString());
+    chart.data.labels = dates.map(timestamp => new Date(timestamp).toLocaleString(undefined, {dateStyle: 'short' , timeStyle: 'short'}));
     chart.data.datasets = datasets;
     chart.update();
 };
