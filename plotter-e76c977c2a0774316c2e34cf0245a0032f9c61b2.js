@@ -76,6 +76,11 @@ const updateChart = data => {
     chart.update();
 };
 
+const clearChart = () => {
+  chart.data.datasets = [];
+  chart.update();
+};
+
 const form = document.querySelector("#userinfo");
 const statusTag = document.querySelector("#status");
 
@@ -93,11 +98,13 @@ async function sendData() {
 
     if(response.status === 404) {
         statusTag.innerHTML = "User " + formData.get("username") + " is not being tracked; to start tracking your user, hop on Pokemon Showdown as your user and message '.subscribe' (without quotation) to my bot, 'im tofas bot'!";
+        clearChart();
         return;
     }
 
     if(response.status === 429) {
         statusTag.innerHTML = "Rate limit reached. You may only submit 5 times within a minute, please try again shortly";
+        clearChart();
         return;
     }
 
