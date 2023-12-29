@@ -24,8 +24,8 @@ const updateChart = data => {
     const datesSet = new Set();
     // collect all dates
     for(const [_, ratings] of Object.entries(data.formats)) {
-        for(const [date, _] of Object.entries(ratings)) {
-            datesSet.add(dateToEpoch(new Date(date).valueOf()));
+        for(const [_, rating] of Object.entries(ratings)) {
+            datesSet.add(dateToEpoch(new Date(rating.created).valueOf()));
         }
     }
 
@@ -60,9 +60,13 @@ const updateChart = data => {
         
         for(const i in dates) {
             const date = dates[i];
-            for(const [ratingDate, rating] of Object.entries(ratings)) {
-                if(dateToEpoch(new Date(ratingDate).valueOf()) == date) {
+            for(const [_, rating] of Object.entries(ratings)) {
+                if(dateToEpoch(new Date(rating.created).valueOf()) == date) {
                     datapoints[i] = Math.round(rating.elo);
+                } else {
+                  // missing datapoint == either something is wrong with collector (less likely) 
+                  //                   OR data is unchanged (more likely, done to address highly inactive users)
+                  datapoints[i] = i === 0 ? null : datapoints[i-1];
                 }
             }
         }
