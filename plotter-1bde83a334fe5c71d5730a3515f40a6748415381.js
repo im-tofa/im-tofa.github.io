@@ -8,6 +8,33 @@ const chart = new Chart("myChart", {
     legend: {display: true},
     responsive: true,
     maintainAspectRatio: false,
+    scales: {
+        x: {
+            type: 'time',
+            time: {
+              unit: 'day',
+              displayFormats: {
+                day: 'MMM D YYYY'
+              }
+            },
+            title: {
+              display: true,
+              text: 'Time'
+            },
+            // ticks: {
+            //   callback: function(val, index) {
+            //     // Hide the label of every 2nd dataset
+            //     return index % 24 === 0 ? val : '';
+            //   }
+            // }
+        },
+        y: {
+          title: {
+            display: true,
+            text: 'ELO'
+          }
+        }
+    }
   }
 });
 
@@ -30,6 +57,7 @@ const updateChart = data => {
     }
 
     const dates = Array.from(datesSet).sort();
+    dates.push(dateToEpoch(new Date().valueOf())); // to ensure that data missing between last change and today are backfilled
 
     /**
      {
@@ -51,6 +79,7 @@ const updateChart = data => {
             label: format,
             borderColor: "rgb(" + colorStr + ")",
             fill: true,
+            borderJoinStyle: "round",
             backgroundColor: "rgba(" + colorStr + ", 0.5)",
             spanGaps: true
         };
@@ -64,12 +93,7 @@ const updateChart = data => {
           for(const rating of ratingValues) {
               if(dateToEpoch(new Date(rating.created).valueOf()) == date) {
                   datapoints[i] = Math.round(rating.elo);
-              } 
-              // else {
-              //   // missing datapoint == either something is wrong with collector (less likely) 
-              //   //                   OR data is unchanged (more likely, done to address highly inactive users)
-              //   datapoints[i] = i === 0 ? null : datapoints[i-1];
-              // }
+              }
           }
         }
 
@@ -83,7 +107,7 @@ const updateChart = data => {
         datasets.push(dataset);
     }
 
-    chart.data.labels = dates.map(timestamp => new Date(timestamp).toLocaleString(undefined, {dateStyle: 'short' , timeStyle: 'short'}));
+    chart.data.labels = dates; //new Date(timestamp).toLocaleString(undefined, {dateStyle: 'short' , timeStyle: 'short'}));
     chart.data.datasets = datasets;
     chart.update();
 };
