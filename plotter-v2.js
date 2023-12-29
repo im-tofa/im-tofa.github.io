@@ -141,7 +141,7 @@ async function sendData() {
     }
 
     if(response.status === 429) {
-        statusTag.innerHTML = "Rate limit reached. You may only submit 5 times within a minute, please try again shortly";
+        statusTag.innerHTML = "Rate limit reached. You may only submit 10 times within a minute, please try again shortly";
         clearChart();
         return;
     }
