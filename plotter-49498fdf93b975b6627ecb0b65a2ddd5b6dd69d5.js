@@ -59,16 +59,24 @@ const updateChart = data => {
         datapoints.fill(null);
         
         for(const i in dates) {
-            const date = dates[i];
-            for(const [_, rating] of Object.entries(ratings)) {
-                if(dateToEpoch(new Date(rating.created).valueOf()) == date) {
-                    datapoints[i] = Math.round(rating.elo);
-                } else {
-                  // missing datapoint == either something is wrong with collector (less likely) 
-                  //                   OR data is unchanged (more likely, done to address highly inactive users)
-                  datapoints[i] = i === 0 ? null : datapoints[i-1];
-                }
-            }
+          const date = dates[i];
+          const ratingValues = Object.values(ratings);
+          for(const rating of ratingValues) {
+              if(dateToEpoch(new Date(rating.created).valueOf()) == date) {
+                  datapoints[i] = Math.round(rating.elo);
+              } 
+              // else {
+              //   // missing datapoint == either something is wrong with collector (less likely) 
+              //   //                   OR data is unchanged (more likely, done to address highly inactive users)
+              //   datapoints[i] = i === 0 ? null : datapoints[i-1];
+              // }
+          }
+        }
+
+        // backfill missing dates
+        for(const i in dates) {
+          if(i === 0) continue;
+          if(datapoints[i] === null) datapoints[i] = datapoints[i-1];
         }
 
         dataset.data = datapoints;
