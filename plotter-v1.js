@@ -29,6 +29,8 @@ const chart = new Chart("myChart", {
             // }
         },
         y: {
+          type: 'linear',
+          grace: '10',
           title: {
             display: true,
             text: 'ELO'
@@ -56,8 +58,8 @@ const updateChart = data => {
         }
     }
 
+    datesSet.add(dateToEpoch(new Date().valueOf())); // to ensure that data missing between last change and today are backfilled
     const dates = Array.from(datesSet).sort();
-    dates.push(dateToEpoch(new Date().valueOf())); // to ensure that data missing between last change and today are backfilled
 
     /**
      {
