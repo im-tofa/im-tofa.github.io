@@ -30,7 +30,7 @@ const chart = new Chart("myChart", {
         },
         y: {
           type: 'linear',
-          grace: '10',
+          grace: '5%',
           title: {
             display: true,
             text: 'ELO'
@@ -48,6 +48,9 @@ const dateToEpoch = date => {
 const R = () => Math.floor(Math.random() * 256);
 const B = R;
 const G = R;
+
+let viewingElo = true;
+let latestData = {};
 
 const updateChart = data => {
     const datesSet = new Set();
@@ -94,7 +97,7 @@ const updateChart = data => {
           const ratingValues = Object.values(ratings);
           for(const rating of ratingValues) {
               if(dateToEpoch(new Date(rating.created).valueOf()) == date) {
-                  datapoints[i] = Math.round(rating.elo);
+                  datapoints[i] = viewingElo ? Math.round(rating.elo) : rating.gxe;
               }
           }
         }
@@ -109,6 +112,7 @@ const updateChart = data => {
         datasets.push(dataset);
     }
 
+    chart.options.scales.y.title.text = viewingElo ? "ELO" : "GXE";
     chart.data.labels = dates; //new Date(timestamp).toLocaleString(undefined, {dateStyle: 'short' , timeStyle: 'short'}));
     chart.data.datasets = datasets;
     chart.update();
@@ -121,6 +125,19 @@ const clearChart = () => {
 
 const form = document.querySelector("#userinfo");
 const statusTag = document.querySelector("#status");
+
+function toggleMetric() {
+  let metric = document.getElementById("myMetric");
+  if (viewingElo) {
+    viewingElo = false;
+    metric.innerHTML = "View ELO";
+  } else {
+    viewingElo = true;
+    metric.innerHTML = "View GXE";
+  }
+
+  updateChart(latestData);
+};
 
 async function sendData() {
   // Associate the FormData object with the form element
@@ -147,11 +164,10 @@ async function sendData() {
     }
 
     statusTag.innerHTML = "";
+    latestData = await response.json();
+    console.log(latestData);
 
-    const data = await response.json();
-    console.log(data);
-
-    updateChart(data);
+    updateChart(latestData);
   } catch (e) {
     console.error(e);
   }
