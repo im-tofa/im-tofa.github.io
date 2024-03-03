@@ -40,9 +40,8 @@ const chart = new Chart("myChart", {
   }
 });
 
-const dateToEpoch = date => {
-    const time = date.valueOf();
-    return time - (time % 3600000);
+const timestampToEpoch = timestamp => {
+    return timestamp - (timestamp % 3600000);
 }
 
 const R = () => Math.floor(Math.random() * 256);
@@ -55,14 +54,15 @@ let latestData = {};
 const updateChart = data => {
     const datesSet = new Set();
     // collect all dates
-    for(const [_, ratings] of Object.entries(data.formats)) {
-        for(const [_, rating] of Object.entries(ratings)) {
-            datesSet.add(dateToEpoch(new Date(rating.created).valueOf()));
+    for(const [_, ratings] of Object.entries(data.ratings)) {
+        for(const rating of ratings) {
+            datesSet.add(timestampToEpoch(rating.created));
         }
     }
 
-    datesSet.add(dateToEpoch(new Date().valueOf())); // to ensure that data missing between last change and today are backfilled
+    datesSet.add(timestampToEpoch(new Date().valueOf())); // to ensure that data missing between last change and today are backfilled
     const dates = Array.from(datesSet).sort();
+    console.log(dates);
 
     /**
      {
@@ -78,7 +78,7 @@ const updateChart = data => {
     const datasets = [];
 
     // iterate through each date and construct graph
-    for(const [format, ratings] of Object.entries(data.formats)) {
+    for(const [format, ratings] of Object.entries(data.ratings)) {
         const colorStr = R() + "," + G() + "," + B();
         const dataset = {
             label: format,
@@ -94,9 +94,8 @@ const updateChart = data => {
         
         for(const i in dates) {
           const date = dates[i];
-          const ratingValues = Object.values(ratings);
-          for(const rating of ratingValues) {
-              if(dateToEpoch(new Date(rating.created).valueOf()) == date) {
+          for(const rating of ratings) {
+              if(timestampToEpoch(rating.created) == date) {
                   datapoints[i] = viewingElo ? Math.round(rating.elo) : rating.gxe;
               }
           }
@@ -147,7 +146,7 @@ async function sendData() {
     
     statusTag.innerHTML = "Fetching data ...";
     const response = await fetch(
-        "https://ratings-api-gjto3y2yyq-ue.a.run.app/api/v1/ratings/" + formData.get("username") + (formData.get("format") ? "?format=" + formData.get("format") : ""), 
+        "http://localhost:3000/api/v1/ratings/" + formData.get("username") + (formData.get("format") ? "?format=" + formData.get("format") : ""), 
         {method: "GET"}
     );
 
