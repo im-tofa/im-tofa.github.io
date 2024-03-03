@@ -146,7 +146,7 @@ async function sendData() {
     
     statusTag.innerHTML = "Fetching data ...";
     const response = await fetch(
-        "http://localhost:3000/api/v1/ratings/" + formData.get("username") + (formData.get("format") ? "?format=" + formData.get("format") : ""), 
+        "https://ratings-api-gjto3y2yyq-ue.a.run.app/api/v1/ratings/" + formData.get("username") + (formData.get("format") ? "?format=" + formData.get("format") : ""), 
         {method: "GET"}
     );
 
