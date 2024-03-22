@@ -131,8 +131,6 @@ const statusTag = document.querySelector("#status");
 const activeFormat = (ratings) => {
   const formData = new FormData(form);
   const days = parseInt(formData.get("days"));
-  console.log(days);
-  console.log(!days);
   if(!days) return true;
 
   const cutoff = new Date();
