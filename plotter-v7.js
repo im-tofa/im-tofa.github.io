@@ -44,7 +44,7 @@ const timestampToEpoch = timestamp => {
     return timestamp - (timestamp % 3600000);
 }
 
-const R = () => Math.floor(Math.random() * 256);
+const R = () => Math.floor(Math.random() * 255);
 const B = R;
 const G = R;
 
@@ -53,8 +53,10 @@ let latestData = {};
 
 const updateChart = data => {
     const datesSet = new Set();
+
     // collect all dates
     for(const [_, ratings] of Object.entries(data.ratings)) {
+        if(!activeFormat(ratings)) continue; // ignore inactive formats
         for(const rating of ratings) {
             datesSet.add(timestampToEpoch(rating.created));
         }
@@ -79,6 +81,7 @@ const updateChart = data => {
 
     // iterate through each date and construct graph
     for(const [format, ratings] of Object.entries(data.ratings)) {
+        if(!activeFormat(ratings)) continue; // ignore inactive formats
         const colorStr = R() + "," + G() + "," + B();
         const dataset = {
             label: format,
@@ -124,6 +127,18 @@ const clearChart = () => {
 
 const form = document.querySelector("#userinfo");
 const statusTag = document.querySelector("#status");
+
+const activeFormat = (ratings) => {
+  const formData = new FormData(form);
+  const days = parseInt(formData.get("days"));
+  console.log(days);
+  console.log(!days);
+  if(!days) return true;
+
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - days);
+  return timestampToEpoch(ratings[0]?.created) >= timestampToEpoch(cutoff.valueOf());
+}
 
 function toggleMetric() {
   let metric = document.getElementById("myMetric");
