@@ -8,6 +8,8 @@ const chart = new Chart("myChart", {
     legend: {display: true},
     responsive: true,
     maintainAspectRatio: false,
+    tension: 0.5,
+    // spanGaps: 1000 * 60 * 60 * 24 * 30, // 30 days
     scales: {
         x: {
             type: 'time',
@@ -89,7 +91,6 @@ const updateChart = data => {
             fill: true,
             borderJoinStyle: "round",
             backgroundColor: "rgba(" + colorStr + ", 0.5)",
-            spanGaps: true
         };
 
         const datapoints = new Array(dates.length);
